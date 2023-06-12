@@ -6,9 +6,11 @@ use App\Entity\Article;
 use App\Form\NewPublicationFormType;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -69,13 +71,26 @@ class BlogController extends AbstractController
      * Controlleur de la page qui liste tous les articles
      */
     #[Route('/publication/liste/', name: 'publication_list')]
-    public function publicationList(ManagerRegistry $doctrine): Response
+    public function publicationList(ManagerRegistry $doctrine, Request $request, PaginatorInterface $paginator): Response
     {
-        // Recuperation du repository des articles
-        $articleRepo = $doctrine->getRepository(Article::class);
 
-        // On demande au repository de nous donner tous les articles qui sont en BDD
-        $articles = $articleRepo->findAll();
+        $requestedPage = $request->query->getInt('page', 1);
+
+            // TODO : verif pas négatif
+        if($requestedPage < 1){
+            throw new NotFoundHttpException();
+        }
+
+        $em = $doctrine->getManager();
+
+        $query = $em->createQuery('SELECT a FROM App\Entity\Article a ORDER BY a.pblicationDate DESC');
+
+        $articles = $paginator->paginate(
+            $query,
+            $requestedPage,
+            10
+        );
+
 
         return $this->render('blog/publication_list.html.twig', [
             'articles' => $articles,
@@ -83,7 +98,7 @@ class BlogController extends AbstractController
     }
 
     /**
-     *
+     * Controleur de la page permettant de voir un article en détail
      */
 
     #[Route('/publication/{slug}/', name: 'publication_view')]

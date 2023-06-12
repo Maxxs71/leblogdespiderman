@@ -56,8 +56,8 @@ class AppFixtures extends Fixture
 
         }
 
-        // Creation de 50 articles
-        for ($i = 0; $i < 50; $i++) {
+        // Creation de 200 articles
+        for ($i = 0; $i < 200; $i++) {
 
             $article = new Article();
 

@@ -18,13 +18,37 @@
 
             <div class="row">
                 <div class="col-12 col-md-4 mx-auto">
-                    {{ form( registrationForm ) }}
+                    {# Ouverture du formulaire #}
+                    {{ form_start( registrationForm ) }}
+
+                    {# Affichage des erreurs generales du formulaires #}
+                    {{ form_errors( registrationForm ) }}
+                    {# Champ email #}
+                    {{ form_row( registrationForm.email) }}
+                    {# Champ pseudo #}
+                    {{ form_row( registrationForm.pseudonym) }}
+                    {# Champ password #}
+                    {{ form_row( registrationForm.plainPassword) }}
+
+
+                    <!-- Ce champ permet d'afficher le captcha de Google en utilisant la clé de site (la première des deux clés) -->
+                    <div class="g-recaptcha mb-2" data-sitekey="{{ google_recaptcha_site_key }}"></div>
+
+                    {# Bouton de validation #}
+                    {{ form_row( registrationForm.save ) }}
+
+                    {# Fermeture du formualire #}
+                    {{ form_end( registrationForm ) }}
                 </div>
             </div>
 
         </div>
 
-
-
     </div>
+
+    {% block js %}
+        <!-- Ce script est nécessaire pour faire fonctionner le Recaptcha Google -->
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    {% endblock %}
+
 {% endblock %}

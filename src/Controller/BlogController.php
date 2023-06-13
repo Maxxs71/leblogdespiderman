@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Prefixe de la route et du nom de toutes les pages de la partie blog du site
@@ -111,5 +112,39 @@ class BlogController extends AbstractController
             'article'=> $article,
         ]);
     }
+
+    /**
+     *  Controleur de la page admin servant a supprimer un article via son id passé dans l'URL
+     *
+     * Acces réservé aux administrateurs (ROLE_ADMIN)
+     *
+     */
+
+    #[Route('/publication/suppression/{id}/', name: 'publication_delete', priority: 10)]
+    #[IsGranted('ROLE_ADMIN')]
+    public function publicationDelete(Article $article, ManagerRegistry $doctrine, Request $request): Response
+    {
+
+        // Verif si token csrf valide
+        if(!$this->isCsrfTokenValid('blog_publication_delete_' . $article->getId(), $request->query->get('csrf_token'))){
+
+            $this->addFlash('error', 'Token securite invalide, veuillez ré-essayer');
+        } else {
+
+
+        $em = $doctrine->getManager();
+        $em->remove($article);
+        $em->flush();
+
+        $this->addFlash('succes', ' La publication a ete supprime avec success');
+    }
+        
+        return $this->redirectToRoute(('blog_publication_list'));
+
+
+
+
+    }
+
 
 }

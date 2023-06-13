@@ -20,9 +20,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/blog', name: 'blog_')]
 class BlogController extends AbstractController
 {
-    #[Route('/nouvelle-publication/', name: 'new_publication')]
+    #[Route('/nouvelle-publication/', name: 'publication_new')]
     #[IsGranted('ROLE_ADMIN')]
-    public function newPublication(Request $request, ManagerRegistry $doctrine): Response
+    public function publicationNew(Request $request, ManagerRegistry $doctrine): Response
     {
 
         // Création d'un nouvel article vide
@@ -63,7 +63,7 @@ class BlogController extends AbstractController
         }
 
 
-        return $this->render('blog/new_publication.html.twig',[
+        return $this->render('blog/publication_new.html.twig',[
             'new_publication_form' => $form->createView(),
         ]);
     }
@@ -138,13 +138,43 @@ class BlogController extends AbstractController
 
         $this->addFlash('succes', ' La publication a ete supprime avec success');
     }
-        
+
         return $this->redirectToRoute(('blog_publication_list'));
-
-
-
 
     }
 
 
+    /**
+     * Controleur de la page admin servant a modifier un article existant via son id passé dans l'url
+     *
+     * Acces reserve aux administrateurs (ROLE_ADMIN)
+     */
+
+    #[Route('/publication/modifier/{id}/', name: 'publication_edit', priority: 10)]
+    #[IsGranted('ROLE_ADMIN')]
+    public function publicationEdit(Article $article, Request $request, ManagerRegistry $doctrine): Response
+    {
+
+        $form = $this->createForm(NewPublicationFormType::class, $article);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()){
+
+            $em = $doctrine->getManager();
+
+            $em->flush();
+
+            $this->addFlash('success','Publication modifiée avec success');
+
+            return $this->redirectToRoute('blog_publication_view',[
+                'slug' => $article->getSlug(),
+            ]);
+
+        }
+
+        return $this->render('blog/publication_edit.html.twig',[
+            'edit_form' => $form->createView(),
+        ]);
+    }
 }

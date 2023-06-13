@@ -3,8 +3,8 @@
 
 body{
     font-family: 'Poppins', sans-serif;
-    background-color: #1A1D45;
-    color: #F5F7F9;
+    background-color: #151749;
+    color: #efebeb;
 }
 
 /* Menu principal */
@@ -16,7 +16,7 @@ body{
 /* Page d'acceuil */
 .batman-cover{
     height: 400px;
-    background-image: url("../images/batman-cover.png");
+    background-image: url("../images/télé.jpg");
     background-attachment: fixed;
     background-size: cover;
 }
@@ -24,7 +24,7 @@ body{
 /* Menus paginations */
 .pagination .page-item .page-link{
     background-color: black;
-    color: #F5F7F9;
+    color: #f9f5f5;
 }
 
 .pagination .page-item.disabled{
@@ -36,5 +36,5 @@ body{
 }
 
 .pagination .page-item a.page-link:hover{
-    background-color: #292929;
+    background-color: #070707;
 }

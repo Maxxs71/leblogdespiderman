@@ -1,7 +1,8 @@
 {# On crée une variable Twig "route" qui contiendra le nom de la route actuellement chargée (servira pour le menu entre autre ) #}
 {% set route = app.request.attributes.get('_route') %}
 <!doctype html>
-<html lang="fr">
+{# data-bs-theme = theme sombre #}
+<html lang="fr" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"

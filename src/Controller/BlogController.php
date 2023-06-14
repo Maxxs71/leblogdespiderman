@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Form\CommentFormType;
 use App\Form\NewPublicationFormType;
-
+use App\Entity\Comment;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -103,13 +104,45 @@ class BlogController extends AbstractController
      */
 
     #[Route('/publication/{slug}/', name: 'publication_view')]
-    public function publicationView(Article $article): Response
+    public function publicationView(Article $article, Request $request, ManagerRegistry $doctrine): Response
     {
+        // Si l'utilisateur n'est pas connecte, on appel la vue en bloquant la suite d chargement du controleur
+        if(!$this->getUser()){
+            return $this->render('blog/publication_view.html.twig',[
+                'article'=> $article,
+                ]);
+        }
 
+        $comment = new Comment();
 
+        $form = $this->createForm(CommentFormType::class, $comment);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+            $comment
+            ->setPublicationDate( new \DateTime())
+            ->setAuthor($this->getUser())
+                ->setArticle($article)
+            ;
+
+            $em = $doctrine->getManager();
+            $em->persist($comment);
+            $em->flush();
+
+            unset($comment);
+            unset($form);
+
+            $comment = new Comment();
+            $form = $this->createForm(CommentFormType::class, $comment);
+
+            $this->addFlash('success', 'Votre commentaire a bien été ajoute');
+        }
 
         return $this->render('blog/publication_view.html.twig',[
             'article'=> $article,
+            'comment_create_form' => $form->createView(),
         ]);
     }
 

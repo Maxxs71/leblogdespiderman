@@ -32,6 +32,7 @@ Cette commande créera :
 * Un compte admin (email: a@a.a , password : 'Azerty12!/')
 * 10 comptes utilisateurs (email aleatoire , password : 'Azert12!/')
 * 200 articles
+* Entre 0 et 10 commentaire par article
 
 ### Installation fichiers front-en des bundles (CKEditor)
 ```

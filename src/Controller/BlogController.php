@@ -210,4 +210,35 @@ class BlogController extends AbstractController
             'edit_form' => $form->createView(),
         ]);
     }
+
+    /**
+     * Controleur de la page permettant aux admins de supprimer
+     *
+     * Acces reserve aux admins (ROLE_ADMIN)
+     */
+
+    #[Route('/commentaires/suppression/{id}/', name: 'comment_delete', priority: 10)]
+    #[IsGranted('ROLE_ADMIN')]
+    public function commentDelete(Comment $comment, Request $request, ManagerRegistry $doctrine): Response
+    {
+
+        if (!$this->isCsrfTokenValid('blog_comment_delete_' . $comment->getId(), $request->query->get('csrf_token'))){
+
+            $this->addFlash('error', 'Token securite invalide, veuillez ré-essayer');
+
+        }else{
+
+            $em = $doctrine->getManager();
+            $em->remove($comment);
+            $em->flush();
+
+            $this->addFlash('success', 'Le commentaire aété supprimé avec succès !');
+        }
+
+        return $this->redirectToRoute('blog_publication_view',[
+            'slug' => $comment->getArticle()->getSlug(),
+        ]);
+
+    }
+
 }
